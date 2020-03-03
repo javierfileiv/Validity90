@@ -626,7 +626,7 @@ void handshake() {
 
     // Send ClientHello
     memcpy(client_hello, tls_client_hello, len);
-    memcpy(client_hello + 0xf, client_random, 0x20);
+    memcpy(client_hello + 0xf, client_random, (sizeof(client_random) / sizeof(byte)));
     HUpdate(tls_hash_context, client_hello + 0x09, 0x43);
     HUpdate(tls_hash_context2, client_hello + 0x09, 0x43);
     qwrite(client_hello, sizeof(tls_client_hello));
@@ -1183,11 +1183,13 @@ int main(int argc, char *argv[]) {
 
                 err(libusb_get_device_descriptor(dev_list[i], &descr));
                 err(libusb_open(dev_list[i], &dev));
-                break;
+                goto end_loop;
             }
         }
 
     }
+
+end_loop:
     if (dev == NULL) {
         puts("No devices found");
         return -1;
